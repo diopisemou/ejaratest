@@ -1,18 +1,20 @@
 const path = require('path');
-const MTProto = require('@mtproto/core');
-// const MTProto = require('@mtproto/core/envs/browser');
+// const MTProto = require('@mtproto/core');
+ const MTProto = require('@mtproto/core/envs/browser');
 const { sleep } = require('@mtproto/core/src/utils/common');
-const api_id = "6301816";
-const api_hash = "ad28ac90638842918e22ab083360c214";
+// const api_id = "6301816";
+const api_id = "6125005";
+// const api_hash = "ad28ac90638842918e22ab083360c214";
+const api_hash = "bfd685d2d5254058bad31591dcd37270";
 
 class API {
   constructor() {
     this.mtproto = new MTProto({
       api_id: api_id,
       api_hash: api_hash,
-      storageOptions: {
-        path: path.resolve(__dirname, './data/1.json'),
-      },
+      // storageOptions: {
+      //   path: path.resolve(__dirname, './data/1.json'),
+      // },
     });
 
     // this.mtproto.updates.on('updatesTooLong', (updateInfo) => {

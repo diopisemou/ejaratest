@@ -4,6 +4,9 @@ import Layout from '../components/layout'
 import { useState } from 'react'
 import api from '../config/telegramapi'
 import Router from 'next/router'
+import * as React from "react";
+import Select from 'react-select';
+
 
 
 async function getUser() {
@@ -20,6 +23,8 @@ async function getUser() {
   }
 };
 
+
+
 async function getGContacts() {
   try {
     const userGroupsAndChannels = await api.call('contacts.getContacts', { 
@@ -34,6 +39,18 @@ async function getGContacts() {
 
 async function getGroupsAndChannels() {
   try {
+    // const userGroupsAndChannels = await api.call('channels.getChannels', { });
+    // const userGroupsAndChannels = await api.call('channels.getGroupsForDiscussion', { });
+    const userGroupsAndChannels = await api.call('messages.getAllChats', { except_ids: [] });
+
+    return userGroupsAndChannels;
+  } catch (error) {
+    return null;
+  }
+};
+
+async function getGroupsAndChannelsMessages() {
+  try {
     const userGroupsAndChannels = await api.call('messages.getAllChats', { });
 
     return userGroupsAndChannels;
@@ -42,16 +59,21 @@ async function getGroupsAndChannels() {
   }
 };
 
-async function sendMessage() {
+async function sendMessage(messageReceiver) {
   try {
-    const messageResult = await api.call('messages.sendMessage', {
-      message: {
-        _: 'inputUserSelf',
-      },
-      peer: {
-        _: 'inputUserSelf',
-      },
+    let receiver = messageReceiver;
+
+    receiver.forEach(async(element) => {
+      let messageResult = await api.call('messages.sendMessage', {
+        message: {
+          _: 'inputUserSelf',
+        },
+        peer: {
+          _: 'inputUserSelf',
+        },
+      });
     });
+    
 
     return messageResult;
   } catch (error) {
@@ -59,29 +81,29 @@ async function sendMessage() {
   }
 };
 
-// This gets called on every request
-export async function getStaticProps() {
-  // Fetch data from external API
-  // const res = await fetch(`https://.../data`)
-  // const res = await getGroupsAndChannels();
-  const res = await getGContacts();
-  const data = res != null && res != undefined ? await res.json() : [];
+// // This gets called on every request
+// export async function getStaticProps() {
+//   // Fetch data from external API
+//   // const res = await fetch(`https://.../data`)
+//   // const res = await getGroupsAndChannels();
+//   const res = await getGContacts();
+//   const data = res != null && res != undefined ? await res.json() : [];
 
-  console.log("res "+res);
-  console.log("data "+data);
+//   console.log("res "+res);
+//   console.log("data "+data);
 
-  if (!data) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    }
-  }
+//   if (!data) {
+//     return {
+//       redirect: {
+//         destination: '/',
+//         permanent: false,
+//       },
+//     }
+//   }
 
-  // Pass data to the page via props
-  return { props: { data } };
-}
+//   // Pass data to the page via props
+//   return { props: { data } };
+// }
 
 // // This gets called on every request
 // export async function getServerSideProps() {
@@ -112,20 +134,59 @@ export default function CreatePost({data}) {
     phone_code: '',
     phone_code_hash: '',
     groups_channels: [],
+    data: [],
+    selectedOption: null,
     resendCodeVal: '',
     error: '',
   });
 
+  React.useEffect(async () => {
+    // window is accessible here.
+    // const res = await getGContacts();
+    const res = await getGroupsAndChannels();
+    if (res != null && res != undefined) {
+      //const data = res.users;
+      console.log("res ");
+      console.log(res);
+    // const data = res.chats.filter(x => x.default_banned_rights != undefined && x.default_banned_rights.send_messages == true);
+    // const data = res.chats.filter(x => x.title.contains('ejara'));
+    const data = res.chats;
+    console.log(data);
+    setUserData({ ...userData, data: data });
+      // const data = res != null && res != undefined ? await res.json() : [];
+      
+      if (!data) {
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false,
+          },
+        }
+      }
+
+      // Pass data to the page via props
+      // return { props: { data } };
+      return { props: { data } };
+    }
+
+      return { props: { } };
+
+  }, []);
+
+  
+
   const generatedNumber = "+9996629641";
+
+  function handleChange(selectedOption)  {
+    setUserData({ ...userData, selectedOption: selectedOption });
+    console.log(`Option selected:`, selectedOption);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
     setUserData({ ...userData, error: '' });
     setUserData({ ...userData, resendCodeVal: '' });
 
-    const phone_number = userData.phone_number;
-    // const phone_number = generatedNumber;
-    const phone_code = userData.phone_code;
     let pcode_hash = userData.phone_code_hash;
     let resendCodeVal = userData.resendCodeVal;
 
@@ -133,11 +194,11 @@ export default function CreatePost({data}) {
     try {
       
       
-      
     } catch (error) {
       console.error(error)
       setUserData({ ...userData, error: error.message });
-      setUserData({ ...userData, resendCodeVal: 'true' });
+      
+      
       if (error.error_message !== 'SESSION_PASSWORD_NEEDED') {
         console.log(`error:`, error);
 
@@ -146,6 +207,17 @@ export default function CreatePost({data}) {
     }
   }
   
+  const options = userData.data.map(x => { let rObj = { value : x.title, label: x.title }
+    
+    return rObj });
+    
+  // const options = 
+  //   [
+  //   { value: 'chocolate', label: 'Chocolate' },
+  //   { value: 'strawberry', label: 'Strawberry' },
+  //   { value: 'vanilla', label: 'Vanilla' }
+  // ];
+
   return (
     <Layout>
       <h1 className="title">
@@ -171,14 +243,12 @@ export default function CreatePost({data}) {
             }
           />
 
-<ul>
-      { data != undefined && data.map((post) => (
-        <li>
-          <h3>{post.filename}</h3>
-          <p>{post.content}</p>
-        </li>
-      ))}
-    </ul>
+<Select
+        value={userData.selectedOption}
+        onChange={handleChange}
+        options={options}
+      />
+
           
           <button type="submit">Send Message </button> 
 

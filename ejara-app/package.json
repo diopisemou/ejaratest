@@ -11,9 +11,17 @@
     "@mtproto/core": "6.0.1",
     "fb": "^2.0.0",
     "fs": "*",
+    "graceful-fs": "^4.2.6",
     "net": "^1.0.2",
     "next": "^10.0.0",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "react-select": "^4.3.1",
+    "react-select-v2": "^2.4.2"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
   }
 }

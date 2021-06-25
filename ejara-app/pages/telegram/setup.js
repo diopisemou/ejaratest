@@ -127,7 +127,9 @@ export default function SetupTelegram() {
     } catch (error) {
       console.error(error)
       setUserData({ ...userData, error: error.message });
-      setUserData({ ...userData, resendCodeVal: 'true' });
+      if (userData.phone_code_hash == undefined || userData.phone_code_hash == '') {
+        setUserData({ ...userData, resendCodeVal: 'true' });
+      }
       if (error.error_message !== 'SESSION_PASSWORD_NEEDED') {
         console.log(`error:`, error);
 
