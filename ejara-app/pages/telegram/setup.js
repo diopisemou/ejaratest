@@ -25,15 +25,29 @@ function sendCode(phone) {
     phone_number: phone,
     settings: {
       _: 'codeSettings',
+      allow_flashcall : true,
+      current_number: true,
+      allow_app_hash: true
     },
   });
 };
 
-function signIn({ code, phone, phone_code_hash }) {
-  return api.call('auth.signIn', {
-    phone_code: code,
+function resendCode({phone, phone_code_hash }) {
+  console.log("phone_code_hash: "+phone_code_hash)
+  return api.call('auth.resendCode', {
     phone_number: phone,
     phone_code_hash: phone_code_hash,
+  });
+};
+
+function signIn({ phone, phone_code_hash ,phone_code }) {
+  console.log(phone);
+  console.log(phone_code_hash);
+  console.log(phone_code);
+  return api.call('auth.signIn', {
+    phone_number: phone,
+    phone_code_hash: phone_code_hash,
+    phone_code: phone_code
   });
 }
 
@@ -55,6 +69,7 @@ export default function SetupTelegram() {
     phone_number: '',
     phone_code: '',
     phone_code_hash: '',
+    resendCodeVal: '',
     error: '',
   });
 
@@ -63,11 +78,13 @@ export default function SetupTelegram() {
   async function handleSubmit(event) {
     event.preventDefault()
     setUserData({ ...userData, error: '' })
+    setUserData({ ...userData, resendCodeVal: '' });
 
     const phone_number = userData.phone_number;
     // const phone_number = generatedNumber;
     const phone_code = userData.phone_code;
     let pcode_hash = userData.phone_code_hash;
+    let resendCodeVal = userData.resendCodeVal;
 
 
     try {
@@ -77,13 +94,23 @@ export default function SetupTelegram() {
         // console.log("i'm here 2 " + pcode_hash.flags);
         // console.log("i'm here 2 " + pcode_hash.next_type);
         setUserData({ ...userData, phone_code_hash: pcode_hash });
+      }
+      else if ( resendCodeVal === 'true') {
+        let pcode_hash2 = await resendCode({
+            phone : phone_number,
+            phone_code_hash: pcode_hash.phone_code_hash
+          });
+        console.log("i'm here 2 resend" +phone_number);
+        // console.log("i'm here 2 " + pcode_hash.flags);
+        // console.log("i'm here 2 " + pcode_hash.next_type);
+        setUserData({ ...userData, phone_code_hash: pcode_hash2 });
       } else {
-        console.log("i'm here 3");
+        console.log("i'm here 3" +  phone_number);
        
         const signInResult = await signIn({
-          phone_number,
-          pcode_hash,
-          phone_code,
+          phone: phone_number,
+          phone_code_hash: pcode_hash.phone_code_hash,
+          phone_code: phone_code,
         });
         console.log("Result sign in " +signInResult);
         if (signInResult._ === 'auth.authorizationSignUpRequired') {
@@ -92,11 +119,15 @@ export default function SetupTelegram() {
             pcode_hash,
           });
         }
+        
+        Router.push('/telegram/createpost')
+
       }
       
     } catch (error) {
       console.error(error)
-      setUserData({ ...userData, error: error.message })
+      setUserData({ ...userData, error: error.message });
+      setUserData({ ...userData, resendCodeVal: 'true' });
       if (error.error_message !== 'SESSION_PASSWORD_NEEDED') {
         console.log(`error:`, error);
 
@@ -152,6 +183,7 @@ export default function SetupTelegram() {
 
 { !userData.phone_code_hash && <button type="submit">Send Code </button> }
           { userData.phone_code_hash && <button type="submit">Login</button> }
+          { userData.resendCodeVal == 'true' && <button type="submit">Resend Code</button> }
 
           {userData.error && <p className="error">Error: {userData.error}</p>}
         </form>

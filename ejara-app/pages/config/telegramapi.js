@@ -1,5 +1,6 @@
 const path = require('path');
-const MTProto = require('@mtproto/core/envs/browser');
+const MTProto = require('@mtproto/core');
+// const MTProto = require('@mtproto/core/envs/browser');
 const { sleep } = require('@mtproto/core/src/utils/common');
 const api_id = "6301816";
 const api_hash = "ad28ac90638842918e22ab083360c214";
@@ -8,39 +9,40 @@ class API {
   constructor() {
     this.mtproto = new MTProto({
       api_id: api_id,
-      api_hash: api_hash
+      api_hash: api_hash,
+      storageOptions: {
+        path: path.resolve(__dirname, './data/1.json'),
+      },
     });
 
-    this.mtproto.updates.on('updatesTooLong', (updateInfo) => {
-        console.log('updatesTooLong:', updateInfo);
-      });
+    // this.mtproto.updates.on('updatesTooLong', (updateInfo) => {
+    //     console.log('updatesTooLong:', updateInfo);
+    //   });
 
-      this.mtproto.updates.on('updateShortMessage', (updateInfo) => {
-        console.log('updateShortMessage:', updateInfo);
-      });
+    //   this.mtproto.updates.on('updateShortMessage', (updateInfo) => {
+    //     console.log('updateShortMessage:', updateInfo);
+    //   });
       
-      this.mtproto.updates.on('updateShortChatMessage', (updateInfo) => {
-        console.log('updateShortChatMessage:', updateInfo);
-      });
+    //   this.mtproto.updates.on('updateShortChatMessage', (updateInfo) => {
+    //     console.log('updateShortChatMessage:', updateInfo);
+    //   });
       
-      this.mtproto.updates.on('updateShort', (updateInfo) => {
-        console.log('updateShort:', updateInfo);
-      });
+    //   this.mtproto.updates.on('updateShort', (updateInfo) => {
+    //     console.log('updateShort:', updateInfo);
+    //   });
       
-      this.mtproto.updates.on('updatesCombined', (updateInfo) => {
-        console.log('updatesCombined:', updateInfo);
-      });
+    //   this.mtproto.updates.on('updatesCombined', (updateInfo) => {
+    //     console.log('updatesCombined:', updateInfo);
+    //   });
       
-      this.mtproto.updates.on('updates', (updateInfo) => {
-        console.log('updates:', updateInfo);
-      });
+    //   this.mtproto.updates.on('updates', (updateInfo) => {
+    //     console.log('updates:', updateInfo);
+    //   });
       
-      this.mtproto.updates.on('updateShortSentMessage', (updateInfo) => {
-        console.log('updateShortSentMessage:', updateInfo);
-      });
+    //   this.mtproto.updates.on('updateShortSentMessage', (updateInfo) => {
+    //     console.log('updateShortSentMessage:', updateInfo);
+    //   });
   }
-
-  
 
   async call(method, params, options = {}) {
     try {
