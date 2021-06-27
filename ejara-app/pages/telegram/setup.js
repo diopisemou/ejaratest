@@ -76,8 +76,8 @@ export default function SetupTelegram() {
   const generatedNumber = "+9996629641";
 
   async function handleSubmit(event) {
-    event.preventDefault()
-    setUserData({ ...userData, error: '' })
+    event.preventDefault();
+    setUserData({ ...userData, error: '' });
     setUserData({ ...userData, resendCodeVal: '' });
 
     const phone_number = userData.phone_number;
@@ -112,15 +112,16 @@ export default function SetupTelegram() {
           phone_code_hash: pcode_hash.phone_code_hash,
           phone_code: phone_code,
         });
-        console.log("Result sign in " +signInResult);
+        console.log("Result sign in ");
+        console.log(signInResult);
         if (signInResult._ === 'auth.authorizationSignUpRequired') {
           await signUp({
             phone_number,
             pcode_hash,
           });
         }
-        
-        Router.push('/telegram/createpost')
+        alert('Login Succesful');
+        Router.push('/telegram/createpost');
 
       }
       

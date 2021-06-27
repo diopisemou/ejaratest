@@ -39,7 +39,7 @@ export default function SetupFacebook() {
 
             <div className="container app">
               <h4>Authentication</h4>
-              <div class="leader">
+              <div className="leader">
                   To use this app, authorize access to Facebook App to manage your profile and pages
               </div>
               

@@ -17,7 +17,8 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-select": "^4.3.1",
-    "react-select-v2": "^2.4.2"
+    "react-select-v2": "^2.4.2",
+    "tls": "^0.0.1"
   },
   "browser": {
     "fs": false,

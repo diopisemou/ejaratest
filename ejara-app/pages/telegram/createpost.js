@@ -6,7 +6,7 @@ import api from '../config/telegramapi'
 import Router from 'next/router'
 import * as React from "react";
 import Select from 'react-select';
-
+import { getRandomInt } from '@mtproto/core/src/utils/common'
 
 
 async function getUser() {
@@ -39,8 +39,7 @@ async function getGContacts() {
 
 async function getGroupsAndChannels() {
   try {
-    // const userGroupsAndChannels = await api.call('channels.getChannels', { });
-    // const userGroupsAndChannels = await api.call('channels.getGroupsForDiscussion', { });
+    
     const userGroupsAndChannels = await api.call('messages.getAllChats', { except_ids: [] });
 
     return userGroupsAndChannels;
@@ -59,71 +58,41 @@ async function getGroupsAndChannelsMessages() {
   }
 };
 
-async function sendMessage(messageReceiver) {
+async function sendMessage(messageReceiver, text_to_send) {
   try {
-    let receiver = messageReceiver;
-
-    receiver.forEach(async(element) => {
+    console.log('send message');
+    console.log(messageReceiver);
+    console.log(text_to_send);
+    if (messageReceiver.type == "channel") {
       let messageResult = await api.call('messages.sendMessage', {
-        message: {
-          _: 'inputUserSelf',
+        peer: { 
+          _:  "inputPeerChannel" ,
+          channel_id: messageReceiver.value,
+          access_hash: messageReceiver.access_hash
         },
-        peer: {
-          _: 'inputUserSelf',
-        },
+        random_id: Math.floor(Math.random() * 5000),
+        message: text_to_send
       });
-    });
-    
-
-    return messageResult;
+      
+      return messageResult;
+    } else if (messageReceiver.type == "chat") {
+      let messageResult = await api.call('messages.sendMessage', {
+        peer: { 
+          _:  "inputPeerChat", 
+          chat_id: messageReceiver.value,
+        },
+        random_id: Math.floor(Math.random() * 5000),
+        message: text_to_send
+      });
+      
+      return messageResult;
+    }
   } catch (error) {
     return null;
   }
 };
 
-// // This gets called on every request
-// export async function getStaticProps() {
-//   // Fetch data from external API
-//   // const res = await fetch(`https://.../data`)
-//   // const res = await getGroupsAndChannels();
-//   const res = await getGContacts();
-//   const data = res != null && res != undefined ? await res.json() : [];
 
-//   console.log("res "+res);
-//   console.log("data "+data);
-
-//   if (!data) {
-//     return {
-//       redirect: {
-//         destination: '/',
-//         permanent: false,
-//       },
-//     }
-//   }
-
-//   // Pass data to the page via props
-//   return { props: { data } };
-// }
-
-// // This gets called on every request
-// export async function getServerSideProps() {
-//   // Fetch data from external API
-//   // const res = await fetch(`https://.../data`)
-//   const res = await getGroupsAndChannels();
-//   const data = await res.json();
-
-//   if (!data) {
-//     return {
-//       redirect: {
-//         destination: '/',
-//         permanent: false,
-//       },
-//     }
-//   }
-
-//   // Pass data to the page via props
-//   return { props: { data } };
-// }
 
 
 export default function CreatePost({data}) {
@@ -142,18 +111,12 @@ export default function CreatePost({data}) {
 
   React.useEffect(async () => {
     // window is accessible here.
-    // const res = await getGContacts();
     const res = await getGroupsAndChannels();
     if (res != null && res != undefined) {
-      //const data = res.users;
-      console.log("res ");
-      console.log(res);
-    // const data = res.chats.filter(x => x.default_banned_rights != undefined && x.default_banned_rights.send_messages == true);
-    // const data = res.chats.filter(x => x.title.contains('ejara'));
-    const data = res.chats;
-    console.log(data);
-    setUserData({ ...userData, data: data });
-      // const data = res != null && res != undefined ? await res.json() : [];
+      
+      const data = res.chats;
+      setUserData({ ...userData, data: data });
+    
       
       if (!data) {
         return {
@@ -173,13 +136,11 @@ export default function CreatePost({data}) {
 
   }, []);
 
-  
 
   const generatedNumber = "+9996629641";
 
   function handleChange(selectedOption)  {
     setUserData({ ...userData, selectedOption: selectedOption });
-    console.log(`Option selected:`, selectedOption);
   }
 
   async function handleSubmit(event) {
@@ -187,13 +148,17 @@ export default function CreatePost({data}) {
     setUserData({ ...userData, error: '' });
     setUserData({ ...userData, resendCodeVal: '' });
 
-    let pcode_hash = userData.phone_code_hash;
-    let resendCodeVal = userData.resendCodeVal;
+    // let pcode_hash = userData.phone_code_hash;
+    // let resendCodeVal = userData.resendCodeVal;
+    let receiverList = userData.selectedOption;
 
 
     try {
       
-      
+      userData.selectedOption.forEach(async (element) => {
+        let res = await sendMessage(element, userData.text_to_send);
+        alert("message sent");
+      });
     } catch (error) {
       console.error(error)
       setUserData({ ...userData, error: error.message });
@@ -207,9 +172,15 @@ export default function CreatePost({data}) {
     }
   }
   
-  const options = userData.data.map(x => { let rObj = { value : x.title, label: x.title }
-    
-    return rObj });
+  const options = userData.data.map(x => { 
+    let rObj = { 
+      value : x.id, label: x.title, access_hash: 0, type: x._, 
+    }
+    if (x.access_hash) {
+      rObj.access_hash = x.access_hash ;
+    }
+    return rObj 
+  });
     
   // const options = 
   //   [
@@ -247,6 +218,8 @@ export default function CreatePost({data}) {
         value={userData.selectedOption}
         onChange={handleChange}
         options={options}
+        isMulti={true}
+        isSearchable={true}
       />
 
           

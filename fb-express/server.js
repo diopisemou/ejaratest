@@ -27,7 +27,8 @@ mongoose.connect('mongodb://127.0.0.1/nodeFB');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-app.use('/src', express.static(__dirname + '/public'));
+app.use('../../ejara-app/pages', express.static(__dirname + '/public'));
+// app.use('/src', express.static(__dirname + '/public'));
 app.use('/media', express.static(__dirname + '/media'));
 
 app.use(fileUpload());
@@ -69,6 +70,10 @@ app.get('*',
 
 scheduler();
 
-https.createServer(options, app).listen(port, function(){
+// https.createServer(options, app).listen(port, function(){
+//     console.log("Express server listening on port " + port);
+// });
+
+https.createServer(app).listen(port, function(){
     console.log("Express server listening on port " + port);
 });

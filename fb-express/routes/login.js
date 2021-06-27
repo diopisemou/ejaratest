@@ -5,7 +5,8 @@ const express = require('express'),
 router.get('/',
     require('connect-ensure-login').ensureLoggedOut(),
     (req, res) => {
-        res.render('login', {user : null});
+        res.redirect('http://localhost:3000/telegram/setup');
+        //res.render('login', {user : null});
     });
 
 router.get('/facebook',

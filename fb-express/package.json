@@ -2,7 +2,7 @@
   "name": "fb-express",
   "version": "1.0.0",
   "description": "fb post handler",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev-server": "nodemon server.js --config nodemon.json",
     "watch": "webpack --config webpack.config.js"
