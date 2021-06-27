@@ -12,44 +12,9 @@ export default function SuccessPublish() {
 
       <main>
         <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Ejara Publish bot .js!</a>
+          Message Sent Successfully
         </h1>
 
-        <p className="description">
-          Get started by selecting one social network 
-        </p>
-
-        <div className="grid">
-
-        <Link href="/telegram/setup">
-          <a className="card">
-            <h3>Telegram  &rarr;</h3>
-            <p> Lorem Ipsum .</p>
-          </a>
-        </Link>
-
-        <Link href="/facebook/setup">
-          <a className="card">
-            <h3>Facebook  &rarr;</h3>
-            <p> Lorem Ipsum .</p>
-          </a>
-        </Link>
-
-        <Link href="/instagram/setup">
-          <a className="card">
-            <h3>Instagram  &rarr;</h3>
-            <p> Lorem Ipsum .</p>
-          </a>
-        </Link>
-
-        <Link href="/telegram/setup">
-          <a className="card">
-            <h3>Learn More  &rarr;</h3>
-            <p> Lorem Ipsum .</p>
-          </a>
-        </Link>
-
-        </div>
       </main>
 
       <footer>

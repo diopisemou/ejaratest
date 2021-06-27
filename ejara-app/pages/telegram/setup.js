@@ -6,20 +6,6 @@ import api from '../config/telegramapi'
 import Router from 'next/router'
 
 
-async function getUser() {
-  try {
-    const user = await api.call('users.getFullUser', {
-      id: {
-        _: 'inputUserSelf',
-      },
-    });
-
-    return user;
-  } catch (error) {
-    return null;
-  }
-};
-
 function sendCode(phone) {
   return api.call('auth.sendCode', {
     phone_number: phone,
@@ -73,15 +59,12 @@ export default function SetupTelegram() {
     error: '',
   });
 
-  const generatedNumber = "+9996629641";
-
   async function handleSubmit(event) {
     event.preventDefault();
     setUserData({ ...userData, error: '' });
     setUserData({ ...userData, resendCodeVal: '' });
 
     const phone_number = userData.phone_number;
-    // const phone_number = generatedNumber;
     const phone_code = userData.phone_code;
     let pcode_hash = userData.phone_code_hash;
     let resendCodeVal = userData.resendCodeVal;
@@ -90,30 +73,24 @@ export default function SetupTelegram() {
     try {
       if ( pcode_hash === '' || pcode_hash == null || pcode_hash == undefined) {
         pcode_hash = await sendCode(phone_number);
-        console.log("i'm here 2 " +phone_number);
-        // console.log("i'm here 2 " + pcode_hash.flags);
-        // console.log("i'm here 2 " + pcode_hash.next_type);
         setUserData({ ...userData, phone_code_hash: pcode_hash });
       }
       else if ( resendCodeVal === 'true') {
+
         let pcode_hash2 = await resendCode({
             phone : phone_number,
             phone_code_hash: pcode_hash.phone_code_hash
           });
-        console.log("i'm here 2 resend" +phone_number);
-        // console.log("i'm here 2 " + pcode_hash.flags);
-        // console.log("i'm here 2 " + pcode_hash.next_type);
         setUserData({ ...userData, phone_code_hash: pcode_hash2 });
+
       } else {
-        console.log("i'm here 3" +  phone_number);
-       
+        
         const signInResult = await signIn({
           phone: phone_number,
           phone_code_hash: pcode_hash.phone_code_hash,
           phone_code: phone_code,
         });
-        console.log("Result sign in ");
-        console.log(signInResult);
+        
         if (signInResult._ === 'auth.authorizationSignUpRequired') {
           await signUp({
             phone_number,

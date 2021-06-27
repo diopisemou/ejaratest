@@ -1,56 +1,17 @@
-import Head from 'next/head'
-import Link from 'next/link'
+
 import Layout from '../components/layout'
 import { useState } from 'react'
 import api from '../config/telegramapi'
 import Router from 'next/router'
-import * as React from "react";
 import Select from 'react-select';
 import { getRandomInt } from '@mtproto/core/src/utils/common'
 
 
-async function getUser() {
-  try {
-    const user = await api.call('users.getFullUser', {
-      id: {
-        _: 'inputUserSelf',
-      },
-    });
-
-    return user;
-  } catch (error) {
-    return null;
-  }
-};
-
-
-
-async function getGContacts() {
-  try {
-    const userGroupsAndChannels = await api.call('contacts.getContacts', { 
-      hash: 0
-    });
-
-    return userGroupsAndChannels;
-  } catch (error) {
-    return null;
-  }
-};
 
 async function getGroupsAndChannels() {
   try {
     
     const userGroupsAndChannels = await api.call('messages.getAllChats', { except_ids: [] });
-
-    return userGroupsAndChannels;
-  } catch (error) {
-    return null;
-  }
-};
-
-async function getGroupsAndChannelsMessages() {
-  try {
-    const userGroupsAndChannels = await api.call('messages.getAllChats', { });
 
     return userGroupsAndChannels;
   } catch (error) {
@@ -137,8 +98,6 @@ export default function CreatePost({data}) {
   }, []);
 
 
-  const generatedNumber = "+9996629641";
-
   function handleChange(selectedOption)  {
     setUserData({ ...userData, selectedOption: selectedOption });
   }
@@ -146,13 +105,7 @@ export default function CreatePost({data}) {
   async function handleSubmit(event) {
     event.preventDefault();
     setUserData({ ...userData, error: '' });
-    setUserData({ ...userData, resendCodeVal: '' });
-
-    // let pcode_hash = userData.phone_code_hash;
-    // let resendCodeVal = userData.resendCodeVal;
-    let receiverList = userData.selectedOption;
-
-
+    
     try {
       
       userData.selectedOption.forEach(async (element) => {
@@ -182,14 +135,8 @@ export default function CreatePost({data}) {
     return rObj 
   });
     
-  // const options = 
-  //   [
-  //   { value: 'chocolate', label: 'Chocolate' },
-  //   { value: 'strawberry', label: 'Strawberry' },
-  //   { value: 'vanilla', label: 'Vanilla' }
-  // ];
 
-  return (
+ return (
     <Layout>
       <h1 className="title">
          Create Post
