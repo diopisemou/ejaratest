@@ -5,7 +5,7 @@ import api from '../config/telegramapi'
 import Router from 'next/router'
 import Select from 'react-select';
 import { getRandomInt } from '@mtproto/core/src/utils/common'
-
+import * as React from "react";
 
 
 async function getGroupsAndChannels() {
